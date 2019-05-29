@@ -38,7 +38,8 @@ ROOT.TH1.SetDefaultSumw2(True)
 ROOT.gStyle.SetOptFit(1)  # only show fit params and errors
 # ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch(True)
-ROOT.gStyle.SetPalette(55)
+# ROOT.gStyle.SetPalette(55)
+ROOT.gStyle.SetPalette(57)
 ROOT.gErrorIgnoreLevel = ROOT.kWarning # turn off the printing output
 
 #################################################
@@ -49,7 +50,7 @@ ROOT.gErrorIgnoreLevel = ROOT.kWarning # turn off the printing output
 l1_str = 'L1'
 # l1_str = 'PF'
 
-ref_str = "GenJet"
+ref_str = "ref"
 # ref_str = "PFJet"
 
 # Some common axis labels
@@ -59,8 +60,8 @@ eta_ref_str = "|#eta^{%s}|" % (ref_str)
 eta_l1_str = "|#eta^{%s}|" % (l1_str)
 dr_str = "#DeltaR(%s jet, Ref jet)" % (l1_str)
 pt_str = "E_{T}[GeV]"
-pt_l1_str = "E_{T}^{%s} [GeV]" % (l1_str)
-pt_ref_str = "E_{T}^{%s} [GeV]" % (ref_str)
+pt_l1_str = "E_{T}^{%s} (GeV)" % (l1_str)
+pt_ref_str = "E_{T}^{%s} (GeV)" % (ref_str)
 res_l1_str = "#sigma(E_{T}^{%s} - E_{T}^{%s})/<E_{T}^{%s}>" % (l1_str, ref_str, l1_str)
 res_ref_str = "#sigma(E_{T}^{%s} - E_{T}^{%s})/<E_{T}^{%s}>" % (l1_str, ref_str, ref_str)
 alt_res_l1_str = "(E_{T}^{%s} - E_{T}^{%s})/E_{T}^{%s}" % (l1_str, ref_str, l1_str)
@@ -96,7 +97,7 @@ plot_markers = [20, 21, 22, 23]
 
 def generate_canvas(title=""):
     """Generate a standard TCanvas for all plots"""
-    c = ROOT.TCanvas("c", title, 1200, 900)
+    c = ROOT.TCanvas("c", title, 800, 600)
     c.SetTicks(1, 1)
     return c
 
@@ -355,15 +356,21 @@ def plot_l1_Vs_ref(check_file, eta_min, eta_max, logZ, oDir, oFormat="pdf"):
     if logZ:
         c.SetLogz()
         app = "_log"
-    h2d_gen_l1.SetTitle("%s: %g-%g;%s;%s" % (eta_l1_str, eta_min, eta_max, pt_ref_str, pt_l1_str))
+    # h2d_gen_l1.SetTitle("%s: %g-%g;%s;%s" % (eta_l1_str, eta_min, eta_max, pt_ref_str, pt_l1_str))
+    h2d_gen_l1.SetTitle("%g < %s < %g;%s;%s" % (eta_min, eta_l1_str, eta_max, pt_ref_str, pt_l1_str))
     h2d_gen_l1.Draw("COLZ")
+    # max_pt = 512
     max_pt = 512
     h2d_gen_l1.SetAxisRange(0, max_pt, 'X')
     h2d_gen_l1.SetAxisRange(0, max_pt, 'Y')
+    h2d_gen_l1.GetXaxis().SetTitleSize(0.046)
+    h2d_gen_l1.GetXaxis().SetTitleOffset(0.92)
+    h2d_gen_l1.GetYaxis().SetTitleSize(0.046)
+    h2d_gen_l1.GetYaxis().SetTitleOffset(1.00)
     # lines of constant response
     line1 = ROOT.TLine(0, 0, max_pt, max_pt)
-    line1.SetLineStyle(1)
-    line1.SetLineWidth(2)
+    line1.SetLineStyle(9)
+    line1.SetLineWidth(4)
     line1.Draw()
 
     line1p25 = ROOT.TLine(0, 0, max_pt / 1.25, max_pt)
@@ -995,7 +1002,7 @@ def main(in_args=sys.argv[1:]):
         # indiviudal eta bins
         for eta_min, eta_max in pairwise(etaBins):
             for (normX, logZ) in product([True, False], [True, False]):
-                plot_l1_Vs_ref(check_file, eta_min, eta_max, logZ, args.oDir, 'png')
+                plot_l1_Vs_ref(check_file, eta_min, eta_max, logZ, args.oDir, 'pdf')
                 plot_rsp_Vs_l1(check_file, eta_min, eta_max, normX, logZ, args.oDir, 'png')
                 plot_rsp_Vs_ref(check_file, eta_min, eta_max, normX, logZ, args.oDir, 'png')
                 plot_rsp_Vs_pt_candle_violin(check_file, eta_min, eta_max, "l1", args.oDir, 'png')
@@ -1039,7 +1046,7 @@ def main(in_args=sys.argv[1:]):
             print eta_min, eta_max
 
             for (normX, logZ) in product([True, False], [True, False]):
-                plot_l1_Vs_ref(check_file, eta_min, eta_max, logZ, args.oDir, 'png')
+                plot_l1_Vs_ref(check_file, eta_min, eta_max, logZ, args.oDir, 'pdf')
                 plot_rsp_Vs_l1(check_file, eta_min, eta_max, normX, logZ, args.oDir, 'png')
                 plot_rsp_Vs_ref(check_file, eta_min, eta_max, normX, logZ, args.oDir, 'png')
 
